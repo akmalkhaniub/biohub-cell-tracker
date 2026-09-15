@@ -1,0 +1,24 @@
+{
+  "name": "biohub-cell-tracker",
+  "version": "1.0.0",
+  "description": "3D Spatiotemporal Cell Tracker & Mitotic Lineage Solver for Chan Zuckerberg Biohub Kaggle Challenge",
+  "main": "src/kalman_tracker_3d.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test/verify_cell_tracking.js",
+    "start": "node test/verify_cell_tracking.js"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "biohub",
+    "cell-tracking",
+    "mot",
+    "kalman-filter",
+    "mitosis",
+    "microscopy",
+    "kaggle"
+  ],
+  "author": "Antigravity Builder",
+  "license": "MIT"
+}
