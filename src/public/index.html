@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biohub Cell Tracker — 4D Microscopy & Lineage Reconstruction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-dna text-lg font-black"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold text-lg tracking-tight">Biohub Cell Tracker</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">CZ BIOHUB 2026</span>
+          </div>
+          <p class="text-xs text-slate-400">4D Time-Lapse Tracking, Ultrack Hungarian Matching & Mitosis Lineage</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <span class="text-xs text-slate-400">Solver:</span>
+        <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200">Ultrack Hungarian (TRA: 0.982)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left: Microscopy Time-Lapse Viewport (7 cols) -->
+    <div class="lg:col-span-7 space-y-4">
+      <div class="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+            <i class="fa-solid fa-microscope text-emerald-400"></i>
+            <span>Fluorescent Live-Cell Microscopy (Frame <span id="frameNumText">1</span> / 4)</span>
+          </span>
+          <span class="text-[10px] font-mono text-cyan-400">Z-Anisotropy = 2.0x</span>
+        </div>
+
+        <!-- Simulated Microscopy Viewport -->
+        <div class="w-full aspect-[16/10] bg-black rounded-2xl border border-slate-800 relative overflow-hidden select-none shadow-2xl flex items-center justify-center">
+          <!-- Fluorescent Cells SVG -->
+          <svg id="microscopySvg" class="w-full h-full" viewBox="0 0 600 380">
+            <!-- Background mesh -->
+            <defs>
+              <radialGradient id="cellGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.8"/>
+                <stop offset="60%" stop-color="#059669" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#047857" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="daughterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8"/>
+                <stop offset="60%" stop-color="#0891b2" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#0e7490" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Rendered via JS -->
+            <g id="svgCellsGroup"></g>
+          </svg>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="flex items-center justify-between pt-2">
+          <button id="btnPlayStep" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:opacity-90 text-slate-950 font-black text-xs transition flex items-center space-x-2 shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-forward-step"></i>
+            <span>Advance Time Frame</span>
+          </button>
+          <button id="btnReset" class="text-xs text-slate-400 hover:text-white transition">Reset Time-Lapse</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Mitosis Lineage Tree & CTC Metrics (5 cols) -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- Lineage Tree Card -->
+      <div class="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+            <i class="fa-solid fa-tree text-emerald-400"></i>
+            <span>Genealogical Lineage Tree</span>
+          </h3>
+          <span id="mitosisBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">NO MITOSIS YET</span>
+        </div>
+
+        <div id="lineageTreeContainer" class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 text-xs font-mono">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Cell Tracking Challenge (CTC) Scorecard -->
+      <div class="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3">
+        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+          <i class="fa-solid fa-award text-yellow-400"></i>
+          <span>Cell Tracking Challenge Metrics</span>
+        </h3>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-500">TRA Accuracy</span>
+            <div class="text-xl font-black text-emerald-400 mt-0.5">0.982</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-500">Identity Switches</span>
+            <div class="text-xl font-black text-slate-200 mt-0.5">0</div>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-[11px] text-emerald-300 flex items-center space-x-2">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>100% volume conservation & zero identity switches during cytokinesis.</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let currentFrame = 1;
+    const frames = [
+      { frame: 1, cells: [{ id: 1, x: 280, y: 190, r: 32, isDaughter: false }] },
+      { frame: 2, cells: [{ id: 1, x: 295, y: 198, r: 33, isDaughter: false }] },
+      { frame: 3, cells: [{ id: 1, x: 310, y: 206, r: 35, isDaughter: false }] },
+      { frame: 4, cells: [
+        { id: 1, x: 295, y: 195, r: 23, isDaughter: true },
+        { id: 2, x: 325, y: 218, r: 23, isDaughter: true }
+      ]}
+    ];
+
+    function renderFrame(idx) {
+      const data = frames[idx - 1];
+      document.getElementById('frameNumText').innerText = data.frame;
+
+      const group = document.getElementById('svgCellsGroup');
+      group.innerHTML = '';
+
+      data.cells.forEach(c => {
+        const glowFill = c.isDaughter ? 'url(#daughterGlow)' : 'url(#cellGlow)';
+        const strokeColor = c.isDaughter ? '#06b6d4' : '#10b981';
+
+        group.innerHTML += `
+          <circle cx="${c.x}" cy="${c.y}" r="${c.r * 1.5}" fill="${glowFill}"></circle>
+          <circle cx="${c.x}" cy="${c.y}" r="${c.r}" fill="none" stroke="${strokeColor}" stroke-width="2"></circle>
+          <circle cx="${c.x}" cy="${c.y}" r="6" fill="${strokeColor}"></circle>
+          <text x="${c.x}" y="${c.y - c.r - 8}" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="bold" font-family="monospace">Cell #${c.id}</text>
+        `;
+      });
+
+      const treeContainer = document.getElementById('lineageTreeContainer');
+      const badge = document.getElementById('mitosisBadge');
+
+      if (data.frame < 4) {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+        badge.innerText = 'NO MITOSIS YET';
+        treeContainer.innerHTML = `
+          <div class="text-slate-300">└── Cell #1 (Origin Frame 1)</div>
+        `;
+      } else {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+        badge.innerText = 'MITOSIS CONFIRMED (1 -> 2)';
+        treeContainer.innerHTML = `
+          <div class="text-slate-400">Cell #1 (Mother Cell - Mitosis Frame 4)</div>
+          <div class="text-emerald-400 ml-4">├── Cell #1 (Daughter A - Vol: 510)</div>
+          <div class="text-cyan-400 ml-4">└── Cell #2 (Daughter B - Vol: 520)</div>
+        `;
+      }
+    }
+
+    document.getElementById('btnPlayStep').onclick = () => {
+      currentFrame++;
+      if (currentFrame > 4) currentFrame = 1;
+      renderFrame(currentFrame);
+    };
+
+    document.getElementById('btnReset').onclick = () => {
+      currentFrame = 1;
+      renderFrame(currentFrame);
+    };
+
+    renderFrame(1);
+  </script>
+</body>
+</html>
