@@ -5,8 +5,12 @@
   "main": "src/kalman_tracker_3d.js",
   "type": "module",
   "scripts": {
+    "start": "node src/server.js",
     "test": "node test/verify_cell_tracking.js",
-    "start": "node test/verify_cell_tracking.js"
+    "docker:build": "docker build -t biohub-cell-tracker:latest .",
+    "docker:run": "docker run -d -p 3009:3009 --name biohub-cell-tracker biohub-cell-tracker:latest",
+    "docker:compose": "docker compose up -d",
+    "tunnel": "powershell -ExecutionPolicy Bypass -File deploy/free/tunnel.ps1"
   },
   "dependencies": {},
   "devDependencies": {},

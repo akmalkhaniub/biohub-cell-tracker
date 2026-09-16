@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: biohub-cell-tracker
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3009
+    healthCheckPath: /api/health
+    autoDeploy: true
