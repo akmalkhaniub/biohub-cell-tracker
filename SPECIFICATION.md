@@ -1,6 +1,8 @@
 # Technical Specification: 3D Spatiotemporal Cell Tracker
 **Project Name:** 3D Spatiotemporal Cell Tracker (Biohub Challenge)  
-**Status:** Ready for Implementation  
+**Status:** Rebuilt in Python — CTC tracking submission (updated 2026-09-18)  
+
+> **Implementation status (2026-09-18):** Rebuilt from the Node prototype (now under `legacy-js/`) into a Python package (`celltracker/`): a 3D Kalman filter, **Hungarian** optimal association (`scipy.optimize.linear_sum_assignment`) with a gated distance+volume cost, track lifecycle + mitosis detection, and CTC `res_track.txt` lineage export. 7 pytest cases pass. Not built: the 3D segmentation model (StarDist-3D/U-Net) that produces detections from raw volumes; the hardcoded 0.982 TRA demo value is removed.
 **Version:** 1.0.0  
 
 ---
