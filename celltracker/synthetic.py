@@ -35,3 +35,14 @@ def dividing_track(n_frames: int = 10) -> list[list[Detection]]:
                 Detection(base_x + (f - split), 52, 30, volume=95.0),
             ])
     return frames
+
+
+def make_volume(centroids, shape=(12, 64, 64), radius=3.0, intensity=200.0, bg=20.0, seed=0):
+    """Render a (D,H,W) volume with bright Gaussian blobs at the given (z,y,x) centroids."""
+    rng = np.random.default_rng(seed)
+    vol = np.full(shape, bg, dtype=np.float32) + rng.normal(0, 3, shape).astype(np.float32)
+    zz, yy, xx = np.indices(shape)
+    for (cz, cy, cx) in centroids:
+        d2 = (zz - cz) ** 2 + (yy - cy) ** 2 + (xx - cx) ** 2
+        vol += intensity * np.exp(-d2 / (2 * radius ** 2))
+    return vol

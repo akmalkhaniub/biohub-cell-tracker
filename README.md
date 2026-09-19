@@ -36,6 +36,10 @@ pytest -q                       # Kalman, Hungarian, tracking, mitosis, CTC-form
 python notebooks/kaggle_run.py  # synthetic demo -> res_track.txt (wire load_frames for real data)
 ```
 
+## Segmentation (no trained model needed)
+
+`celltracker.segment_volume()` turns a raw (D,H,W) intensity volume into cell-centroid detections via Otsu threshold + 3D connected-component labeling (`scipy.ndimage`) — closing the detections gap **without a trained model or GPU**. The pipeline now runs end-to-end **volume → segment → track → CTC lineage** (see `tests/test_segmentation.py`). Swap in StarDist-3D / a 3D U-Net for higher recall.
+
 ## Metrics
 
 `celltracker.metrics.evaluate_on_synthetic()` runs the tracker on labeled ground-truth trajectories and reports identity **purity**, **ID switches**, and a **MOTA**-style score (the family of numbers CTC TRA rewards). On clean constant-velocity tracks: purity 1.0, 0 ID switches, MOTA 1.0. Tested in `tests/test_metrics.py`. Swap the synthetic GT for the challenge's annotated frames to score real data.
