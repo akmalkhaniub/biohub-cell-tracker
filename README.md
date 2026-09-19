@@ -36,6 +36,10 @@ pytest -q                       # Kalman, Hungarian, tracking, mitosis, CTC-form
 python notebooks/kaggle_run.py  # synthetic demo -> res_track.txt (wire load_frames for real data)
 ```
 
+## Metrics
+
+`celltracker.metrics.evaluate_on_synthetic()` runs the tracker on labeled ground-truth trajectories and reports identity **purity**, **ID switches**, and a **MOTA**-style score (the family of numbers CTC TRA rewards). On clean constant-velocity tracks: purity 1.0, 0 ID switches, MOTA 1.0. Tested in `tests/test_metrics.py`. Swap the synthetic GT for the challenge's annotated frames to score real data.
+
 ## Scope & honesty
 
 The tracking-by-detection stage is real and self-contained (NumPy + SciPy). It assumes
